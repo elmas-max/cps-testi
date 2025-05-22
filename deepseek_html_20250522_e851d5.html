@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CPS Test Yap</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #container {
+            max-width: 500px;
+            margin: 20px;
+            padding: 25px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        #clickArea {
+            width: 300px;
+            height: 200px;
+            margin: 20px auto;
+            background-color: rgba(224, 224, 224, 0.8);
+            border: 3px solid #555;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #clickArea:hover {
+            background-color: rgba(210, 210, 210, 0.9);
+            transform: translateY(-2px);
+        }
+        #clickArea:active {
+            background-color: rgba(200, 200, 200, 0.9);
+            transform: translateY(1px);
+        }
+        #clickArea span {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            z-index: 1;
+        }
+        .click-effect {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(100, 200, 255, 0.7);
+            transform: scale(0);
+            animation: click-animation 0.5s ease-out;
+            pointer-events: none;
+        }
+        @keyframes click-animation {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        #results {
+            margin: 20px 0;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        #results p {
+            margin: 10px 0;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .control-panel {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        #startBtn {
+            background-color: #27ae60;
+        }
+        #startBtn:hover {
+            background-color: #2ecc71;
+        }
+        #resetBtn {
+            background-color: #e74c3c;
+        }
+        #resetBtn:hover {
+            background-color: #c0392b;
+        }
+        #modeBtn {
+            background-color: #3498db;
+        }
+        #modeBtn:hover {
+            background-color: #2980b9;
+        }
+        input[type="range"] {
+            width: 200px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        .setting {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .setting label {
+            color: #2c3e50;
+            font-weight: bold;
+            width: 200px;
+            text-align: left;
+        }
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+            display: none;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        #progressBar {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(221, 221, 221, 0.7);
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        #progress {
+            height: 100%;
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            width: 0%;
+            transition: width 0.1s;
+        }
+        .mode-info {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #2c3e50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>CPS Test Yap</h1>
+        
+        <div class="mode-info" id="modeInfo">
+            <strong>Serbest Mod:</strong> Süre sınırı olmadan CPS ölçümü
+        </div>
+        
+        <div id="timer">00:00</div>
+        <div id="progressBar"><div id="progress"></div></div>
+        
+        <div id="clickArea"><span>Tıkla!</span></div>
+        
+        <div id="results">
+            <p>Son CPS: <span id="cps">0</span></p>
+            <p>Toplam Tıklama: <span id="totalClicks">0</span></p>
+            <p>En Yüksek CPS: <span id="highestCps">0</span></p>
+            <p id="timedResult" style="display:none;">Test CPS: <span id="cpsResult">0</span></p>
+        </div>
+        
+        <div class="control-panel">
+            <h3>Ayarlar</h3>
+            <div class="setting" id="durationSetting" style="display:none;">
+                <label for="testDuration">Test Süresi (saniye):</label>
+                <input type="range" id="testDuration" min="1" max="10" step="1" value="5">
+                <span id="durationValue">5</span>
+            </div>
+            <div class="setting">
+                <label for="effectSize">Animasyon Boyutu:</label>
+                <input type="range" id="effectSize" min="50" max="200" value="100">
+                <span id="effectSizeValue">100</span>
+            </div>
+            <div class="setting">
+                <label for="effectColor">Animasyon Rengi:</label>
+                <input type="color" id="effectColor" value="#64c8ff">
+            </div>
+        </div>
+        
+        <button id="modeBtn">Zamanlı Moda Geç</button>
+        <button id="startBtn">Başlat</button>
+        <button id="resetBtn">Sıfırla</button>
+    </div>
+    
+    <script>
+        const clickArea = document.getElementById('clickArea');
+        const cpsDisplay = document.getElementById('cps');
+        const totalClicksDisplay = document.getElementById('totalClicks');
+        const highestCpsDisplay = document.getElementById('highestCps');
+        const cpsResultDisplay = document.getElementById('cpsResult');
+        const timedResultDisplay = document.getElementById('timedResult');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const modeBtn = document.getElementById('modeBtn');
+        const modeInfo = document.getElementById('modeInfo');
+        const testDurationInput = document.getElementById('testDuration');
+        const durationValueDisplay = document.getElementById('durationValue');
+        const effectSizeInput = document.getElementById('effectSize');
+        const effectSizeValueDisplay = document.getElementById('effectSizeValue');
+        const effectColorInput = document.getElementById('effectColor');
+        const timerDisplay = document.getElementById('timer');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        const durationSetting = document.getElementById('durationSetting');
+        
+        let clickCount = 0;
+        let totalClicks = 0;
+        let highestCps = 0;
+        let testDuration = 5;
+        let effectSize = 100;
+        let effectColor = '#64c8ff';
+        let testActive = false;
+        let timeLeft = 0;
+        let countdownInterval;
+        let cpsInterval;
+        let timedMode = false;
+        let currentCps = 0;
+        
+        testDurationInput.addEventListener('input', () => {
+            testDuration = parseInt(testDurationInput.value);
+            durationValueDisplay.textContent = testDuration;
+        });
+        
+        effectSizeInput.addEventListener('input', () => {
+            effectSize = parseInt(effectSizeInput.value);
+            effectSizeValueDisplay.textContent = effectSize;
+        });
+        
+        effectColorInput.addEventListener('input', () => {
+            effectColor = effectColorInput.value;
+        });
+        
+        modeBtn.addEventListener('click', toggleMode);
+        
+        function toggleMode() {
+            timedMode = !timedMode;
+            
+            if (timedMode) {
+                modeBtn.textContent = 'Serbest Moda Geç';
+                modeInfo.innerHTML = '<strong>Zamanlı Mod:</strong> Belirlenen sürede CPS testi';
+                durationSetting.style.display = 'block';
+                timerDisplay.style.display = 'block';
+                progressBar.style.display = 'block';
+                timedResultDisplay.style.display = 'block';
+            } else {
+                modeBtn.textContent = 'Zamanlı Moda Geç';
+                modeInfo.innerHTML = '<strong>Serbest Mod:</strong> Süre sınırı olmadan CPS ölçümü';
+                durationSetting.style.display = 'none';
+                timerDisplay.style.display = 'none';
+                progressBar.style.display = 'none';
+                timedResultDisplay.style.display = 'none';
+            }
+            
+            resetTest();
+        }
+        
+        startBtn.addEventListener('click', startTest);
+        resetBtn.addEventListener('click', resetTest);
+        
+        function startTest() {
+            if (testActive) return;
+            
+            testActive = true;
+            clickCount = 0;
+            totalClicks = 0;
+            totalClicksDisplay.textContent = '0';
+            cpsDisplay.textContent = '0';
+            
+            if (timedMode) {
+                timeLeft = testDuration;
+                updateTimerDisplay();
+                clickArea.querySelector('span').textContent = 'Tıklamaya başla!';
+                clickArea.style.backgroundColor = 'rgba(200, 230, 201, 0.9)';
+                
+                countdownInterval = setInterval(() => {
+                    timeLeft -= 0.1;
+                    updateTimerDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        endTimedTest();
+                    }
+                }, 100);
+            } else {
+                clickArea.querySelector('span').textContent = 'Tıklamaya devam et!';
+                clickArea.style.backgroundColor = 'rgba(224, 224, 224, 0.9)';
+                
+                cpsInterval = setInterval(() => {
+                    currentCps = clickCount;
+                    cpsDisplay.textContent = currentCps.toFixed(1);
+                    
+                    if (currentCps > highestCps) {
+                        highestCps = currentCps;
+                        highestCpsDisplay.textContent = highestCps.toFixed(1);
+                    }
+                    
+                    clickCount = 0;
+                }, 1000);
+            }
+            
+            clickArea.addEventListener('click', countClick);
+            startBtn.disabled = true;
+        }
+        
+        function countClick(e) {
+            if (!testActive) return;
+            
+            clickCount++;
+            totalClicks++;
+            totalClicksDisplay.textContent = totalClicks;
+            
+            createClickEffect(e);
+        }
+        
+        function createClickEffect(e) {
+            const rect = clickArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            effect.style.width = `${effectSize}px`;
+            effect.style.height = `${effectSize}px`;
+            effect.style.backgroundColor = effectColor;
+            
+            clickArea.appendChild(effect);
+            
+            setTimeout(() => {
+                effect.remove();
+            }, 500);
+        }
+        
+        function updateTimerDisplay() {
+            const seconds = Math.max(0, Math.ceil(timeLeft));
+            const tenths = Math.max(0, Math.floor((timeLeft % 1) * 10));
+            
+            timerDisplay.textContent = `${seconds.toString().padStart(2, '0')}:${tenths}0`;
+            progress.style.width = `${(timeLeft / testDuration) * 100}%`;
+            
+            if (timeLeft <= 3) {
+                progress.style.background = 'linear-gradient(to right, #e74c3c, #c0392b)';
+            } else {
+                progress.style.background = 'linear-gradient(to right, #27ae60, #2ecc71)';
+            }
+        }
+        
+        function endTimedTest() {
+            clearInterval(countdownInterval);
+            testActive = false;
+            
+            const cps = totalClicks / testDuration;
+            cpsResultDisplay.textContent = cps.toFixed(1);
+            
+            if (cps > highestCps) {
+                highestCps = cps;
+                highestCpsDisplay.textContent = highestCps.toFixed(1);
+            }
+            
+            clickArea.querySelector('span').textContent = 'Test Tamamlandı!';
+            clickArea.style.backgroundColor = 'rgba(255, 205, 210, 0.9)';
+            clickArea.removeEventListener('click', countClick);
+            startBtn.disabled = false;
+        }
+        
+        function resetTest() {
+            if (timedMode) {
+                clearInterval(countdownInterval);
+            } else {
+                clearInterval(cpsInterval);
+            }
+            
+            testActive = false;
+            
+            clickCount = 0;
+            currentCps = 0;
+            totalClicks = 0;
+            timeLeft = timedMode ? testDuration : 0;
+            
+            cpsDisplay.textContent = '0';
+            totalClicksDisplay.textContent = '0';
+            cpsResultDisplay.textContent = '0';
+            
+            if (timedMode) {
+                timerDisplay.textContent = '00:00';
+                progress.style.width = '100%';
+                progress.style.background = 'linear-gradient(to right, #27ae60, #2ecc71)';
+                clickArea.querySelector('span').textContent = 'Başlatmak için tıkla';
+                clickArea.style.backgroundColor = 'rgba(224, 224, 224, 0.9)';
+            } else {
+                clickArea.querySelector('span').textContent = 'Tıkla!';
+                clickArea.style.backgroundColor = 'rgba(224, 224, 224, 0.9)';
+            }
+            
+            clickArea.removeEventListener('click', countClick);
+            startBtn.disabled = false;
+        }
+    </script>
+</body>
+</html>
